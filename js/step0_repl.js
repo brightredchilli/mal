@@ -22,17 +22,21 @@ function PRINT(exp) {
 var rep = function(str) { return PRINT(EVAL(READ(str), {})); };
 
 // repl loop
-if (typeof require !== 'undefined' && require.main === module) {
-    // Synchronous node.js commandline mode
-    while (true) {
-        var line = readline.readline("user> ");
-        if (line === null) { break; }
-        try {
-            if (line) { printer.println(rep(line)); }
-        } catch (exc) {
-
-            if (exc.stack) { printer.println(exc.stack); }
-            else           { printer.println(exc); }
-        }
+while (true) {
+  var line = readline.readline("user> ");
+  if (line === null) {
+    break;
+  }
+  try {
+    if (line) {
+      printer.println(rep(line))
     }
+  } catch (exc) {
+
+    if (exc.stack) {
+      printer.println(exc.stack)
+    } else {
+      printer.println(exc)
+    }
+  }
 }
