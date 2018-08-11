@@ -1,10 +1,15 @@
 if (typeof module !== 'undefined') {
     var readline = require('./node_readline');
+    var printer = require('./printer');
+    var reader = require('./reader');
 }
+process.on('SIGINT', function() {
+  process.exit();
+});
 
 // read
 function READ(str) {
-    return str;
+    return reader.read_str(str);
 }
 
 // eval
@@ -14,7 +19,7 @@ function EVAL(ast, env) {
 
 // print
 function PRINT(exp) {
-    return exp;
+  return printer.pr_str(exp);
 }
 
 // repl
@@ -28,15 +33,15 @@ while (true) {
   }
   try {
     if (line) {
-      console.log(line)
-      // printer.println(rep(line))
+      if (line == "quit") { break }
+      console.log(rep(line))
     }
   } catch (exc) {
-
-    // if (exc.stack) {
-    //   printer.println(exc.stack)
-    // } else {
-    //   printer.println(exc)
-    // }
+    console.log("Exception caught:")
+    if (exc.stack) {
+      console.log(exc.stack)
+    } else {
+      console.log(exc)
+    }
   }
 }
