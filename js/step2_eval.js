@@ -14,7 +14,13 @@ function READ(str) {
 
 // eval
 function EVAL(ast, env) {
-    return ast;
+  if (ast instanceof Array) {
+    if (ast.length == 0) { return ast }
+    [f, ...args] = eval_ast(ast, env)
+    return f(...args)
+  } else {
+    return eval_ast(ast, env)
+  }
 }
 
 // print
@@ -23,7 +29,28 @@ function PRINT(exp) {
 }
 
 // repl
-var rep = function(str) { return PRINT(EVAL(READ(str), {})); };
+var environment = {}
+environment[Symbol("+").toString()] = function(a, b) { return a + b }
+environment[Symbol("-").toString()] = function(a, b) { return a - b }
+environment[Symbol("*").toString()] = function(a, b) { return a * b }
+environment[Symbol("/").toString()] = function(a, b) { return a / b }
+
+function eval_ast(ast, env) {
+  if (ast instanceof Array) {
+    return ast.map(a => EVAL(a, env))
+  } else if (typeof ast == "symbol") {
+    let value = env[ast.toString()]
+    if (value === undefined) {
+      throw "token not found"
+    } else {
+      return value
+    }
+  } else {
+    return ast
+  }
+}
+
+var rep = function(str) { return PRINT(EVAL(READ(str), environment)); };
 
 // repl loop
 while (true) {

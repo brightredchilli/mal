@@ -32,7 +32,6 @@ while (true) {
       // printer.println(rep(line))
     }
   } catch (exc) {
-
     // if (exc.stack) {
     //   printer.println(exc.stack)
     // } else {

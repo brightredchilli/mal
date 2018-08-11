@@ -1,19 +1,19 @@
 
 function pr_str(token) {
   if (token instanceof Array) {
-    console.log("array")
+    // console.log("array")
     return `(${token.map(t => pr_str(t)).join(" ")})`
   } else if (token == null) {
-    console.log("null")
+    // console.log("null")
     return "nil"
   } else if (typeof token == "string") {
-    console.log("string")
+    // console.log("string")
     return `"${token}"`
   } else if (typeof token == "symbol") {
-    console.log("symbol")
+    // console.log("symbol")
     return token.toString().slice(7,-1)
   } else {
-    console.log("other")
+    // console.log("other")
     return token.toString()
   }
 }

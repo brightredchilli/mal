@@ -44,11 +44,13 @@ function read_form(reader) {
   }
 }
 
+var stackcount = 0
+
 function read_list(reader) {
   reader.next()
-  var list = []
+  let list = []
   while (true) {
-    if (reader.peek() == ')') { break }
+    if (reader.peek() == ')') { reader.next(); break }
     if (reader.peek() == undefined) { throw "no matching ) paren" }
     var cur = read_form(reader)
     list.push(cur)
@@ -59,7 +61,7 @@ function read_list(reader) {
 function read_atom(reader) {
   var token = reader.next()
   if (token ==  ")") { throw "no matching ( paren" }
-  if (/^[0-9]+/.exec(token)) {
+  if (/^-?[0-9]+/.exec(token)) {
     return parseInt(token)
   } else if (/"(?:\\.|[^\\"])*"/.exec(token)) {
     // matches strings
