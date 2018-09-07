@@ -72,6 +72,8 @@ function read_atom(reader) {
     return false
   } else if (token == "nil") {
     return null
+  } else if (token.startsWith(":")) {
+    return "\u029E" + token
   } else {
     return Symbol(token)
   }

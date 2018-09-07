@@ -7,8 +7,12 @@ function pr_str(token) {
     // console.log("null")
     return "nil"
   } else if (typeof token == "string") {
-    // console.log("string")
-    return `"${token}"`
+    if (token.startsWith("\u029E")) {
+      return token.slice(1)
+    } else {
+      // console.log("string")
+      return `"${token}"`
+    }
   } else if (typeof token == "symbol") {
     // console.log("symbol")
     return token.toString().slice(7,-1)
