@@ -2,9 +2,13 @@
 function pr_str(token) {
   if (token instanceof Array) {
     // console.log("array")
-    return `(${token.map(t => pr_str(t)).join(" ")})`
+    let arrayString = token.map(t => pr_str(t)).join(" ")
+    if (token.isVector) {
+      return `[${arrayString}]`
+    } else {
+      return `(${arrayString})`
+    }
   } else if (token == null) {
-    // console.log("null")
     return "nil"
   } else if (typeof token == "string") {
     if (token.startsWith("\u029E")) {

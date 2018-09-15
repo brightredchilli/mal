@@ -1,4 +1,6 @@
 
+Array.prototype.isVector = false
+
 var Reader = function(tokens) {
   this.tokens = tokens
   this.position = 0
@@ -37,8 +39,10 @@ function tokenizer(string) {
 }
 
 function read_form(reader) {
-  if (reader.peek() == '(') {
-    return read_list(reader)
+  let token = reader.peek()
+  if (token == '(' || token == '[') {
+    let endToken = token == '(' ? ')' : ']'
+    return read_list(reader, endToken)
   } else {
     return read_atom(reader)
   }
@@ -46,12 +50,15 @@ function read_form(reader) {
 
 var stackcount = 0
 
-function read_list(reader) {
-  reader.next()
+function read_list(reader, endToken) {
+  let startToken = reader.next()
   let list = []
+  if (startToken == '[') {
+    list.isVector = true
+  }
   while (true) {
-    if (reader.peek() == ')') { reader.next(); break }
-    if (reader.peek() == undefined) { throw "no matching ) paren" }
+    if (reader.peek() == endToken) { reader.next(); break }
+    if (reader.peek() == undefined) { throw `no matching ${endToken} paren` }
     var cur = read_form(reader)
     list.push(cur)
   }

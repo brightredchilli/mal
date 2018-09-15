@@ -14,7 +14,7 @@ function READ(str) {
 
 // eval
 function EVAL(ast, env) {
-  if (ast instanceof Array) {
+  if (ast instanceof Array && !ast.isVector) {
     if (ast.length == 0) { return ast }
     [f, ...args] = eval_ast(ast, env)
     return f(...args)
@@ -37,7 +37,9 @@ environment[Symbol("/").toString()] = function(a, b) { return a / b }
 
 function eval_ast(ast, env) {
   if (ast instanceof Array) {
-    return ast.map(a => EVAL(a, env))
+    let mapped = ast.map(a => EVAL(a, env))
+    mapped.isVector = ast.isVector
+    return mapped
   } else if (typeof ast == "symbol") {
     let value = env[ast.toString()]
     if (value === undefined) {
