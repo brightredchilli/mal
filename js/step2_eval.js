@@ -40,6 +40,12 @@ function eval_ast(ast, env) {
     let mapped = ast.map(a => EVAL(a, env))
     mapped.isVector = ast.isVector
     return mapped
+  } if (ast instanceof Map) {
+    let mapped = new Map()
+    for (var e of ast) {
+      mapped[e[0]] = EVAL(ast[e[1]], env)
+    }
+    return mapped
   } else if (typeof ast == "symbol") {
     let value = env[ast.toString()]
     if (value === undefined) {

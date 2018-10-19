@@ -40,8 +40,8 @@ function tokenizer(string) {
 
 function read_form(reader) {
   let token = reader.peek()
-  if (token == '(' || token == '[') {
-    let endToken = token == '(' ? ')' : ']'
+  if (token == '(' || token == '[' || token == '{') {
+    let endToken = token == '(' ? ')' : token == '{' ? '}' : ']'
     return read_list(reader, endToken)
   } else {
     return read_atom(reader)
@@ -62,12 +62,44 @@ function read_list(reader, endToken) {
     var cur = read_form(reader)
     list.push(cur)
   }
-  return list
+
+  if (startToken == '{') {
+    return list.mapToHash()
+  } else {
+    return list
+  }
+}
+
+Array.prototype.mapToHash = function() {
+  let dictionary = new Map()
+  this.forEach((val, index, array) => {
+    if (index % 2 == 1) {
+      let key = array[index - 1]
+      if (typeof key != 'string') {
+        throw `dictionary key must be string, found ${key}`
+      }
+      dictionary[key] = val
+    }
+  })
+  return dictionary
 }
 
 function read_atom(reader) {
   var token = reader.next()
-  if (token ==  ")") { throw "no matching ( paren" }
+  switch (token) {
+    case ")":
+      throw "no matching ( paren"
+      break
+    case "]":
+      throw "no matching { paren"
+      break
+    case "}":
+      throw "no matching } paren"
+      break
+    default:
+      // no-op
+      break
+  }
   if (/^-?[0-9]+/.exec(token)) {
     return parseInt(token)
   } else if (/"(?:\\.|[^\\"])*"/.exec(token)) {
