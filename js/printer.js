@@ -10,8 +10,8 @@ function pr_str(token) {
     }
   } if (token instanceof Map) {
     let string = ""
-    for (let e in token) {
-      string += `${pr_str(e[0])} : ${pr_str(e[1])}`
+    for (let key of Object.keys(token)) {
+      string += `${pr_str(key)} ${pr_str(token[key])}`
     }
     return `{${string}}`
 

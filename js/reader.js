@@ -81,6 +81,7 @@ Array.prototype.mapToHash = function() {
       dictionary[key] = val
     }
   })
+
   return dictionary
 }
 
@@ -91,7 +92,7 @@ function read_atom(reader) {
       throw "no matching ( paren"
       break
     case "]":
-      throw "no matching { paren"
+      throw "no matching [ paren"
       break
     case "}":
       throw "no matching } paren"
