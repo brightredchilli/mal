@@ -1,3 +1,7 @@
+let types = require("./types")
+let Symbol = types.Symbol
+let __is_symbol = types.__is_symbol
+
 if (typeof module !== 'undefined') {
     var readline = require('./node_readline');
     var printer = require('./printer');
@@ -30,10 +34,10 @@ function PRINT(exp) {
 
 // repl
 var environment = {}
-environment[Symbol("+").toString()] = function(a, b) { return a + b }
-environment[Symbol("-").toString()] = function(a, b) { return a - b }
-environment[Symbol("*").toString()] = function(a, b) { return a * b }
-environment[Symbol("/").toString()] = function(a, b) { return a / b }
+environment[new Symbol("+")] = function(a, b) { return a + b }
+environment[new Symbol("-")] = function(a, b) { return a - b }
+environment[new Symbol("*")] = function(a, b) { return a * b }
+environment[new Symbol("/")] = function(a, b) { return a / b }
 
 function eval_ast(ast, env) {
   if (ast instanceof Array) {
@@ -46,7 +50,7 @@ function eval_ast(ast, env) {
       mapped[key] = EVAL(ast[key], env)
     }
     return mapped
-  } else if (typeof ast == "symbol") {
+  } else if (ast instanceof Symbol) {
     let value = env[ast.toString()]
     if (value === undefined) {
       throw "token not found"

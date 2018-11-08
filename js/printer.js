@@ -1,3 +1,6 @@
+let types = require("./types")
+let Symbol = types.Symbol
+let __is_symbol = types.__is_symbol
 
 function pr_str(token) {
   if (token instanceof Array) {
@@ -24,9 +27,9 @@ function pr_str(token) {
       // console.log("string")
       return `"${token}"`
     }
-  } else if (typeof token == "symbol") {
+  } else if (token instanceof Symbol) {
     // console.log("symbol")
-    return token.toString().slice(7,-1)
+    return token.toString()
   } else {
     // console.log("other")
     return token.toString()

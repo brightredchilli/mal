@@ -1,3 +1,6 @@
+let types = require("./types")
+let Symbol = types.Symbol
+let __is_symbol = types.__is_symbol
 
 Array.prototype.isVector = false
 
@@ -115,7 +118,7 @@ function read_atom(reader) {
   } else if (token.startsWith(":")) {
     return "\u029E" + token
   } else {
-    return Symbol(token)
+    return new Symbol(token)
   }
 }
 
