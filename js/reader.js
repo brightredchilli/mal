@@ -1,6 +1,5 @@
 let types = require("./types")
 let Symbol = types.Symbol
-let __is_symbol = types.__is_symbol
 
 Array.prototype.isVector = false
 

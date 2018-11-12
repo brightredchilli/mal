@@ -1,6 +1,5 @@
 let types = require("./types")
 let Symbol = types.Symbol
-let __is_symbol = types.__is_symbol
 
 function pr_str(token) {
   if (token instanceof Array) {
