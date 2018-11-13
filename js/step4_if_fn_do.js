@@ -1,3 +1,4 @@
+"use strict"
 let types = require("./types")
 let Env = require("./env")
 let Symbol = types.Symbol
@@ -18,20 +19,20 @@ function READ(str) {
 
 // eval
 function EVAL(ast, env) {
-  let first, second, third
   if (ast instanceof Array && !ast.isVector) {
     if (ast.length == 0) { return ast }
     switch (String(ast[0])) {
-      case "def!":
-        [__, first, second] = ast
+      case "def!": {
+        let [__, first, second] = ast
         // console.log(`def! first=${first} second=${second}`)
         let value = EVAL(second, env)
         // console.log(`def! value=${value}`)
         env.set(first, value)
         return value
         break
-      case "let*":
-        [__, first, second] = ast
+      }
+      case "let*": {
+        let [__, first, second] = ast
         // console.log(`let* first=${first} second=${second}`)
         let newEnv = new Env(env)
         for (var i = 0; i < first.length - 1 ; i += 2) {
@@ -41,11 +42,13 @@ function EVAL(ast, env) {
 
         // console.log(`new env=${JSON.stringify(newEnv.data)}`)
         return EVAL(second, newEnv)
-      case "do":
+      }
+      case "do": {
         let results = eval_ast(ast.slice(1))
         return results[-1]
-      case "if":
-        [__, first, second, third] = ast
+      }
+      case "if": {
+        let [__, first, second, third] = ast
         let first_result = EVAL(first, env)
         if (first_result != null && first_result != false) {
           return EVAL(second, env)
@@ -53,16 +56,19 @@ function EVAL(ast, env) {
           return EVAL(third, env)
         }
         return null
-      case "fn*":
-        [__, first, second] = ast
+      }
+      case "fn*": {
+        let [__, first, second] = ast
         return (...args) => {
           let newEnv = new Env(env, first, args)
           return EVAL(second, newEnv)
         }
         break
-      default:
-        [f, ...args] = eval_ast(ast, env)
+      }
+      default: {
+        let [f, ...args] = eval_ast(ast, env)
         return f(...args)
+      }
     }
   } else {
     // console.log(`EVAL eval_ast ast=${ast}`)

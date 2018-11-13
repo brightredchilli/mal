@@ -1,3 +1,4 @@
+"use strict"
 const Symbol = function(value) {
   if (typeof value != "string") {
     throw `${value} is not a string!`

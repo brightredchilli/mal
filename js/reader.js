@@ -1,3 +1,4 @@
+"use strict"
 let types = require("./types")
 let Symbol = types.Symbol
 
