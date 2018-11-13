@@ -1,9 +1,13 @@
 let types = require("./types")
 let Symbol = types.Symbol
 
-const Env = function(outer) {
+const Env = function(outer, binds, exprs) {
   this.data = {}
   this.outer = outer
+
+  if (binds) {
+    binds.forEach((elem, i) => this.set(elem, exprs[i]))
+  }
 }
 
 Env.prototype.set = function(symbol, value) {

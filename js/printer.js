@@ -29,6 +29,8 @@ function pr_str(token) {
   } else if (token instanceof Symbol) {
     // console.log("symbol")
     return token.toString()
+  } else if (typeof token == "function") {
+    return `#${token.toString()}`
   } else {
     // console.log("other")
     return token.toString()
