@@ -1,5 +1,6 @@
 "use strict"
 let types = require("./types")
+const core = require("./core")
 let Env = require("./env")
 let Symbol = types.Symbol
 
@@ -49,8 +50,10 @@ function EVAL(ast, env) {
       }
       case "if": {
         let [__, first, second, third] = ast
+        // console.log(`if ${first} ${second} ${third}`)
         let first_result = EVAL(first, env)
-        if (first_result != null && first_result != false) {
+        // console.log(`first_result = ${first_result}`)
+        if (first_result !== null && first_result !== false) {
           return EVAL(second, env)
         } else if (third != undefined) {
           return EVAL(third, env)
@@ -81,20 +84,20 @@ function PRINT(exp) {
   return printer.pr_str(exp);
 }
 
-// repl
-var environment = new Env()
-environment.set(new Symbol("+"), (a, b) => a + b)
-environment.set(new Symbol("-"), (a, b) => a - b)
-environment.set(new Symbol("*"), (a, b) => a * b)
-environment.set(new Symbol("/"), (a, b) => a / b)
+// repl_enw
+var repl_env = new Env()
+
+for (let [k, v] of core.ns) {
+  repl_env.set(k, v)
+}
 
 function eval_ast(ast, env) {
   if (ast instanceof Array) {
-    // console.log(`ast is Array`)
     let mapped = ast.map(a => EVAL(a, env))
     mapped.isVector = ast.isVector
+    // console.log(`ast is Array mapped is ${mapped}`)
     return mapped
-  } if (ast instanceof Map) {
+  } else if (ast instanceof Map) {
     // console.log(`ast is Map`)
     let mapped = new Map()
     for (const key of Object.keys(ast)) {
@@ -114,7 +117,7 @@ function eval_ast(ast, env) {
   }
 }
 
-var rep = function(str) { return PRINT(EVAL(READ(str), environment)); };
+var rep = function(str) { return PRINT(EVAL(READ(str), repl_env)); };
 
 // repl loop
 while (true) {
