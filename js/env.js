@@ -7,7 +7,14 @@ const Env = function(outer, binds, exprs) {
   this.outer = outer
 
   if (binds) {
-    binds.forEach((elem, i) => this.set(elem, exprs[i]))
+    for (let i = 0; i < binds.length; i++) {
+      if (binds[i] == "&" && i != binds.length - 1) {
+        this.set(binds[i + 1], exprs.slice(i))
+        break
+      } else {
+        this.set(binds[i], exprs[i])
+      }
+    }
   }
 }
 

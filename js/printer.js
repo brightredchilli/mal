@@ -17,7 +17,7 @@ function pr_str(token, print_readably) {
     return `{${string}}`
 
   } else if (types.isNull(token)) {
-    return "nil--debug"
+    return "nil"
   } else if (types.isString(token)) {
     // console.log("string")
     if (print_readably) {

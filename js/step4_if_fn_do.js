@@ -45,8 +45,8 @@ function EVAL(ast, env) {
         return EVAL(second, newEnv)
       }
       case "do": {
-        let results = eval_ast(ast.slice(1))
-        return results[-1]
+        let results = eval_ast(ast.slice(1), env)
+        return results[results.length - 1]
       }
       case "if": {
         let [__, first, second, third] = ast
@@ -84,7 +84,7 @@ function PRINT(exp) {
   return printer.pr_str(exp);
 }
 
-// repl_enw
+// repl_env
 var repl_env = new Env()
 
 for (let [k, v] of core.ns) {
@@ -118,6 +118,7 @@ function eval_ast(ast, env) {
 }
 
 var rep = function(str) { return PRINT(EVAL(READ(str), repl_env)); };
+rep("(def! not (fn* (a) (if a false true)))")
 
 // repl loop
 while (true) {

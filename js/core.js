@@ -12,12 +12,14 @@ ns.set(new Symbol("prn"), (a) => { console.log(printer.pr_str(a, true)); return 
 ns.set(new Symbol("list"), (...params) => params)
 ns.set(new Symbol("list?"), (a) => a instanceof Array)
 ns.set(new Symbol("empty?"), (a) => a.length == 0)
-ns.set(new Symbol("count"), (a) => a.length)
+ns.set(new Symbol("count"), (a) => a instanceof Array ? a.length : 0)
 ns.set(new Symbol("="), (a, b) => equals(a, b))
 ns.set(new Symbol("<"), (a, b) => a < b)
 ns.set(new Symbol("<="), (a, b) => a <= b)
 ns.set(new Symbol(">"), (a, b) => a > b)
-ns.set(new Symbol(">="), (a, b) =>  a >= b)
+ns.set(new Symbol(">="), (a, b) => a >= b)
+ns.set(new Symbol("not"), a => !a)
+ns.set(new Symbol("pr-str"), (...params) => params.map(a => printer.pr_str(a, true)).join(" "))
 
 // predicate is a function that takes element and returns bool
 Array.prototype.allSatisfy = function(predicate) {
@@ -32,8 +34,9 @@ Array.prototype.allSatisfy = function(predicate) {
 function equals(lhs, rhs) {
    // console.log(`equals ${types.typeOf(lhs)} ${types.typeOf(rhs)})`)
   if (lhs === rhs) { return true }
+  if (types.typeOf(lhs) != types.typeOf(rhs)) { return false }
 
-  if (types.isArrayLike(lhs) && types.isArrayLike(rhs)) {
+  if (types.isArrayLike(lhs)) {
     if (lhs.length != rhs.length) { return false }
     for (let i = 0; i < lhs.length; i++) {
       if (!equals(lhs[i], rhs[i])) {
@@ -41,17 +44,17 @@ function equals(lhs, rhs) {
       }
     }
     return true
-  } else if (types.isHash(lhs) && types.isHash(rhs)) {
+  } else if (types.isHash(lhs)) {
     for (let [lhsKey, lhsValue] of lhs) {
       if (!equals(lhsValue, rhs[lhsKey])) {
         return false
       }
     }
     return true
+  } else if (types.isSymbol(lhs)) {
+    return lhs.value == rhs.value
   } else {
-    // console.log("compare value lhs rhs")
-  if (types.typeOf(lhs) != types.typeOf(rhs)) { return false }
-    return equals(lhs, rhs)
+    return lhs == rhs
   }
 }
 
