@@ -35,7 +35,7 @@ function pr_str(token, print_readably) {
     // console.log("symbol")
     return token.toString()
   } else if (types.isFunction(token)) {
-    return `#${token.toString()}`
+    return `#<function>`
   } else {
     // console.log("other")
     return token.toString()

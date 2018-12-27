@@ -6,6 +6,13 @@ const Symbol = function(value) {
   this.value = value
 }
 
+const MalFunction = function(ast, params, env, fn) {
+  this.ast = ast
+  this.params = params
+  this.env = env
+  this.fn = fn
+}
+
 Symbol.prototype.toString = function() {
   return this.value
 }
@@ -39,7 +46,7 @@ let isArrayLike = token => {
 }
 
 let isFunction = token => {
-  return typeof token == "function"
+  return typeof token == "function" || token instanceof MalFunction
 }
 
 let isSymbol = token => {
@@ -79,3 +86,4 @@ module.exports.isFunction = isFunction
 module.exports.isSymbol = isSymbol
 module.exports.typeOf = typeOf
 module.exports.Symbol = Symbol
+module.exports.MalFunction = MalFunction
