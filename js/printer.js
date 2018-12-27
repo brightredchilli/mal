@@ -22,12 +22,12 @@ function pr_str(token, print_readably) {
     // console.log("string")
     if (print_readably) {
       var readable = token
+        .replace(/\\/g, "\\\\")
+        .replace(/"/g, '\\"')
         .replace(/\n/g, "\\n")
-        .replace(/"/g, "\"")
-        .replace(/\\/g, "\\")
       return `"${readable}"`
     } else {
-      return `"${token}"`
+      return token
     }
   } else if (types.isKeyword(token)) {
     return token.slice(1)

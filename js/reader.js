@@ -109,6 +109,7 @@ function read_atom(reader) {
   } else if (/"(?:\\.|[^\\"])*"/.exec(token)) {
     // matches strings
     return token.slice(1, -1)
+      .replace(/(\\.)/g, (_, match) => match == "\\n" ? "\n" : match[1])
   } else if (token == "true") {
     return true
   } else if (token == "false") {

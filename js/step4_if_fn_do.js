@@ -54,7 +54,9 @@ function EVAL(ast, env) {
         let first_result = EVAL(first, env)
         // console.log(`first_result = ${first_result}`)
         if (first_result !== null && first_result !== false) {
-          return EVAL(second, env)
+          let second_result = EVAL(second, env)
+          // console.log(`second=${second} second_result = ${second_result}`)
+          return second_result
         } else if (third != undefined) {
           return EVAL(third, env)
         }
@@ -81,7 +83,7 @@ function EVAL(ast, env) {
 
 // print
 function PRINT(exp) {
-  return printer.pr_str(exp);
+  return printer.pr_str(exp, true);
 }
 
 // repl_env

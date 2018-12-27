@@ -8,9 +8,9 @@ ns.set(new Symbol("+"), (a, b) => a + b)
 ns.set(new Symbol("-"), (a, b) => a - b)
 ns.set(new Symbol("*"), (a, b) => a * b)
 ns.set(new Symbol("/"), (a, b) => a / b)
-ns.set(new Symbol("prn"), (a) => { console.log(printer.pr_str(a, true)); return null; })
+// ns.set(new Symbol("list"), (...params) => { console.trace(params); return params })
 ns.set(new Symbol("list"), (...params) => params)
-ns.set(new Symbol("list?"), (a) => a instanceof Array)
+ns.set(new Symbol("list?"), (a) => types.isArray(a))
 ns.set(new Symbol("empty?"), (a) => a.length == 0)
 ns.set(new Symbol("count"), (a) => a instanceof Array ? a.length : 0)
 ns.set(new Symbol("="), (a, b) => equals(a, b))
@@ -18,8 +18,10 @@ ns.set(new Symbol("<"), (a, b) => a < b)
 ns.set(new Symbol("<="), (a, b) => a <= b)
 ns.set(new Symbol(">"), (a, b) => a > b)
 ns.set(new Symbol(">="), (a, b) => a >= b)
-ns.set(new Symbol("not"), a => !a)
 ns.set(new Symbol("pr-str"), (...params) => params.map(a => printer.pr_str(a, true)).join(" "))
+ns.set(new Symbol("str"), (...params) => params.map(a => printer.pr_str(a, false)).join(""))
+ns.set(new Symbol("prn"), (...params) => { console.log(params.map(a => printer.pr_str(a, true)).join(" ")); return null; })
+ns.set(new Symbol("println"), (...params) => { console.log(params.map(a => printer.pr_str(a, false)).join(" ")); return null; })
 
 // predicate is a function that takes element and returns bool
 Array.prototype.allSatisfy = function(predicate) {
@@ -34,9 +36,11 @@ Array.prototype.allSatisfy = function(predicate) {
 function equals(lhs, rhs) {
    // console.log(`equals ${types.typeOf(lhs)} ${types.typeOf(rhs)})`)
   if (lhs === rhs) { return true }
-  if (types.typeOf(lhs) != types.typeOf(rhs)) { return false }
+  const bothArrays = types.isArrayLike(lhs) && types.isArrayLike(rhs)
+  const sameTypes = types.typeOf(lhs) == types.typeOf(rhs)
+  if (!(sameTypes || bothArrays)) { return false }
 
-  if (types.isArrayLike(lhs)) {
+  if (bothArrays) {
     if (lhs.length != rhs.length) { return false }
     for (let i = 0; i < lhs.length; i++) {
       if (!equals(lhs[i], rhs[i])) {
@@ -44,7 +48,9 @@ function equals(lhs, rhs) {
       }
     }
     return true
-  } else if (types.isHash(lhs)) {
+  }
+
+  if (types.isHash(lhs)) {
     for (let [lhsKey, lhsValue] of lhs) {
       if (!equals(lhsValue, rhs[lhsKey])) {
         return false
