@@ -20,6 +20,27 @@ function READ(str) {
     return reader.read_str(str);
 }
 
+function is_pair(arg) {
+  return types.isArrayLike(arg) && arg.length > 0
+}
+
+function quasiquote(ast) {
+  // console.log(ast)
+  if (!is_pair(ast)) {
+    return [new Symbol("quote"), ast]
+  } else if (ast[0] == "unquote") {
+    return ast[1]
+  }
+  let [first, ...second] = ast
+
+  if (is_pair(first) && first[0] == "splice-unquote") {
+    return [new Symbol("concat"), first[1], quasiquote(second)]
+  } else {
+    return [new Symbol("cons"), quasiquote(first), quasiquote(second)]
+  }
+
+}
+
 // eval
 function EVAL(ast, env) {
   while(true) {
@@ -49,6 +70,13 @@ function EVAL(ast, env) {
           env = newEnv
           break
         }
+        case "quote": {
+          return ast[1]
+        }
+        case "quasiquote": {
+          ast = quasiquote(ast[1])
+          continue //TCO
+        }
         case "do": {
           let results = eval_ast(ast.slice(1, -1), env)
           ast = ast[ast.length - 1]
@@ -62,10 +90,10 @@ function EVAL(ast, env) {
           if (first_result !== null && first_result !== false) {
             // console.log(`second=${second} second_result = ${second_result}`)
             ast = second
-            continue
+            continue //TCO
           } else if (third != undefined) {
             ast = third
-            continue
+            continue //TCO
           }
           return null
           break
