@@ -36,6 +36,8 @@ function pr_str(token, print_readably) {
     return token.toString()
   } else if (types.isFunction(token)) {
     return `#<function>`
+  } else if (types.isAtom(token)) {
+    return `(atom ${token.value})`
   } else {
     // console.log("other")
     return token.toString()

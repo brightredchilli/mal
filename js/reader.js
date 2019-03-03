@@ -1,6 +1,7 @@
 "use strict"
 let types = require("./types")
 let Symbol = types.Symbol
+let NoTokenException = types.NoTokenException
 
 Array.prototype.isVector = false
 
@@ -46,6 +47,9 @@ function read_form(reader) {
   if (token == '(' || token == '[' || token == '{') {
     let endToken = token == '(' ? ')' : token == '{' ? '}' : ']'
     return read_list(reader, endToken)
+  } else if (token == '@') {
+    reader.next()
+    return [new Symbol("deref"), read_form(reader)]
   } else {
     return read_atom(reader)
   }
@@ -59,11 +63,21 @@ function read_list(reader, endToken) {
   if (startToken == '[') {
     list.isVector = true
   }
+
   while (true) {
     if (reader.peek() == endToken) { reader.next(); break }
     if (reader.peek() == undefined) { throw `no matching ${endToken} paren` }
-    var cur = read_form(reader)
-    list.push(cur)
+
+    try {
+      let cur = read_form(reader)
+      list.push(cur)
+    } catch (exc) {
+      if (exc instanceof NoTokenException) {
+        continue
+      } else {
+        throw exc
+      }
+    }
   }
 
   if (startToken == '{') {
@@ -90,6 +104,7 @@ Array.prototype.mapToHash = function() {
 
 function read_atom(reader) {
   var token = reader.next()
+  // console.log(`token ${token}`)
   switch (token) {
     case ")":
       throw "no matching ( paren"
@@ -110,6 +125,11 @@ function read_atom(reader) {
     // matches strings
     return token.slice(1, -1)
       .replace(/(\\.)/g, (_, match) => match == "\\n" ? "\n" : match[1])
+  } else if (token[0] == ";") {
+    // console.log(`comment ${token}`)
+    // matches comments
+    throw new NoTokenException()
+    return null
   } else if (token == "true") {
     return true
   } else if (token == "false") {
@@ -125,6 +145,3 @@ function read_atom(reader) {
 
 module.exports.read_str = read_str
 module.exports.tokenizer = tokenizer
-module.exports.read_form = read_form
-module.exports.read_list = read_list
-module.exports.read_atom = read_atom

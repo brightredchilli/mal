@@ -1,4 +1,6 @@
 "use strict"
+const NoTokenException = function () { }
+
 const Symbol = function(value) {
   if (typeof value != "string") {
     throw `${value} is not a string!`
@@ -11,6 +13,10 @@ const MalFunction = function(ast, params, env, fn) {
   this.params = params
   this.env = env
   this.fn = fn
+}
+
+const MalAtom = function(value) {
+  this.value = value
 }
 
 Symbol.prototype.toString = function() {
@@ -49,6 +55,10 @@ let isFunction = token => {
   return typeof token == "function" || token instanceof MalFunction
 }
 
+let isAtom = token => {
+  return token instanceof MalAtom
+}
+
 let isSymbol = token => {
   return token instanceof Symbol
 }
@@ -84,6 +94,9 @@ module.exports.isVector = isVector
 module.exports.isArrayLike = isArrayLike
 module.exports.isFunction = isFunction
 module.exports.isSymbol = isSymbol
+module.exports.isAtom = isAtom
 module.exports.typeOf = typeOf
 module.exports.Symbol = Symbol
 module.exports.MalFunction = MalFunction
+module.exports.MalAtom = MalAtom
+module.exports.NoTokenException = NoTokenException
