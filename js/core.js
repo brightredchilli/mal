@@ -41,6 +41,11 @@ ns.set(new Symbol("swap!"), (atom, f, ...args) => {
     return reset(atom, f.fn(atom.value, ...args))
   }
 })
+ns.set(new Symbol("cons"), (first, rest) => [first].concat(rest))
+ns.set(new Symbol("concat"), (...params) => {
+  if (params.length == 0) { return [] }
+  return params.reduce((acc, next) => acc.concat(next))
+})
 
 // predicate is a function that takes element and returns bool
 Array.prototype.allSatisfy = function(predicate) {
