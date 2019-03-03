@@ -50,6 +50,18 @@ function read_form(reader) {
   } else if (token == '@') {
     reader.next()
     return [new Symbol("deref"), read_form(reader)]
+  } else if (token == '\'') {
+    reader.next()
+    return [new Symbol("quote"), read_form(reader)]
+  } else if (token == '`') {
+    reader.next()
+    return [new Symbol("quasiquote"), read_form(reader)]
+  } else if (token == '~') {
+    reader.next()
+    return [new Symbol("unquote"), read_form(reader)]
+  } else if (token == '~@') {
+    reader.next()
+    return [new Symbol("splice-unquote"), read_form(reader)]
   } else {
     return read_atom(reader)
   }
