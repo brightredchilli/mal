@@ -3,7 +3,7 @@ let types = require("./types")
 let Symbol = types.Symbol
 
 const Env = function(outer, binds, exprs) {
-  this.data = {}
+  this.data = new Map()
   this.outer = outer
 
   if (binds) {
@@ -18,20 +18,33 @@ const Env = function(outer, binds, exprs) {
   }
 }
 
+Env.prototype.print = function() {
+  console.log('printing env')
+  for (let [key, value] of this.data) {
+    console.log(`${key} : ${value}`)
+  }
+}
+
 Env.prototype.set = function(symbol, value) {
   // console.log(`Env.set ${symbol} = ${value}`)
   if (!(symbol instanceof Symbol)) { throw `${symbol} not a Symbol` }
-  this.data[symbol] = value
+  this.data.set(symbol.value, value)
+  // console.log('after set')
+  // this.print()
 }
 
 Env.prototype.find = function(symbol) {
   if (!(symbol instanceof Symbol)) { throw `${symbol} not a Symbol` }
 
-  if (this.data.hasOwnProperty(symbol)) {
+  // console.log(`finding ${symbol}`)
+  if (this.data.has(symbol.value)) {
+    // console.log(`found ${symbol}`)
     return this
   } else if (typeof this.outer != "undefined") {
+    // console.log(`finding ${symbol} in outer`)
     return this.outer.find(symbol)
   }
+    // console.log(`did not find ${symbol}`)
 }
 
 Env.prototype.get = function(symbol) {
@@ -42,7 +55,7 @@ Env.prototype.get = function(symbol) {
     return undefined
   }
 
-  return env.data[symbol]
+  return env.data.get(symbol.value)
 }
 
 module.exports = Env

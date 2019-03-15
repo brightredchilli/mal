@@ -15,6 +15,10 @@ const MalFunction = function(ast, params, env, fn) {
   this.fn = fn
 }
 
+// extends all javascript function types
+Function.prototype.is_macro = false
+MalFunction.prototype.is_macro = false
+
 const MalAtom = function(value) {
   this.value = value
 }
@@ -60,6 +64,10 @@ let isAtom = token => {
 }
 
 let isSymbol = token => {
+  return token instanceof Symbol
+}
+
+let isMacro = token => {
   return token instanceof Symbol
 }
 
