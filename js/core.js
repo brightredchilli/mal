@@ -46,6 +46,19 @@ ns.set(new Symbol("concat"), (...params) => {
   if (params.length == 0) { return [] }
   return params.reduce((acc, next) => acc.concat(next))
 })
+ns.set(new Symbol("nth"), (array, i) => {
+  if (i >= array.length) {
+    throw new RangeError(`The index ${i} exceeds array length ${array.length}`)
+  }
+  return array[i]
+})
+ns.set(new Symbol("first"), (array) => {
+  if (array == null || array == undefined || array.length == 0) {
+    return null
+  }
+  return array[0]
+})
+ns.set(new Symbol("rest"), (array) => types.isArrayLike(array) ? array.slice(1) : [])
 
 // predicate is a function that takes element and returns bool
 Array.prototype.allSatisfy = function(predicate) {
