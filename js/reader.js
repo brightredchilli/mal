@@ -3,8 +3,6 @@ let types = require("./types")
 let Symbol = types.Symbol
 let NoTokenException = types.NoTokenException
 
-Array.prototype.isVector = false
-
 var Reader = function(tokens) {
   this.tokens = tokens
   this.position = 0
@@ -73,7 +71,7 @@ function read_list(reader, endToken) {
   let startToken = reader.next()
   let list = []
   if (startToken == '[') {
-    list.isVector = true
+    list = types.arrayToVector(list)
   }
 
   while (true) {
@@ -93,25 +91,10 @@ function read_list(reader, endToken) {
   }
 
   if (startToken == '{') {
-    return list.mapToHash()
+    return list.toHashMap()
   } else {
     return list
   }
-}
-
-Array.prototype.mapToHash = function() {
-  let dictionary = new Map()
-  this.forEach((val, index, array) => {
-    if (index % 2 == 1) {
-      let key = array[index - 1]
-      if (typeof key != 'string') {
-        throw `dictionary key must be string, found ${key}`
-      }
-      dictionary[key] = val
-    }
-  })
-
-  return dictionary
 }
 
 function read_atom(reader) {
@@ -149,7 +132,7 @@ function read_atom(reader) {
   } else if (token == "nil") {
     return null
   } else if (token.startsWith(":")) {
-    return "\u029E" + token
+    return types.MakeKeyword(token)
   } else {
     return new Symbol(token)
   }

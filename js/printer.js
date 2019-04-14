@@ -10,11 +10,12 @@ function pr_str(token, print_readably) {
   } else if (types.isVector(token)) {
     return `[${token.map(t => pr_str(t, print_readably)).join(" ")}]`
   } else if (types.isHash(token)) {
-    let string = ""
-    for (let key of Object.keys(token)) {
-      string += `${pr_str(key)} ${pr_str(token[key], print_readably)}`
+    // console.log("isHash")
+    let strings = []
+    for (let key of token.keys()) {
+      strings.push(`${pr_str(key)} ${pr_str(token.get(key), print_readably)}`)
     }
-    return `{${string}}`
+    return `{${strings.join(" ")}}`
 
   } else if (types.isNull(token)) {
     return "nil"

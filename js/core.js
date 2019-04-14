@@ -6,6 +6,7 @@ let printer = require("./printer")
 let reader = require("./reader")
 let Symbol = types.Symbol
 let MalAtom = types.MalAtom
+let MalFunction = types.MalFunction
 
 let ns = new Map()
 ns.set(new Symbol("+"), (a, b) => a + b)
@@ -36,7 +37,7 @@ ns.set(new Symbol("reset!"), (atom, value) => reset(atom, value))
 ns.set(new Symbol("swap!"), (atom, f, ...args) => {
   if (typeof f === "function") {
     return reset(atom, f(atom.value, ...args))
-  } else if (f instanceof types.MalFunction) {
+  } else if (f instanceof MalFunction) {
     // console.log(`swap args: ${args}`)
     return reset(atom, f.fn(atom.value, ...args))
   }
@@ -59,6 +60,84 @@ ns.set(new Symbol("first"), (array) => {
   return array[0]
 })
 ns.set(new Symbol("rest"), (array) => types.isArrayLike(array) ? array.slice(1) : [])
+ns.set(new Symbol("throw"), (arg) => { throw arg })
+ns.set(new Symbol("apply"), (fn, ...rest) => {
+  // console.log(`fn=${fn}, rest=${res...t}`)
+  let args = rest.reduce((acc, next) => acc.concat(next), [])
+  // console.log(`fn=${fn}, rest=${rest}, args= ${args}`)
+  if (fn instanceof MalFunction) {
+    fn = fn.fn
+  }
+  return fn(...args)
+})
+ns.set(new Symbol("map"), (fn, array) => {
+  if (fn instanceof MalFunction) {
+    fn = fn.fn
+  }
+  return array.map(fn)
+})
+
+// Predicates
+ns.set(new Symbol("nil?"), arg => types.isNull(arg))
+ns.set(new Symbol("true?"), arg => arg === true)
+ns.set(new Symbol("false?"), arg => arg === false)
+ns.set(new Symbol("symbol?"), arg => types.isSymbol(arg))
+ns.set(new Symbol("symbol"), arg => {
+  if (!types.isString(arg)) {
+    throw `symbol: ${arg} is not a string`
+  }
+  return new Symbol(arg)
+})
+ns.set(new Symbol("keyword"), arg => {
+  if (!types.isString(arg)) {
+    throw `keyword: ${arg} is not a string`
+  }
+
+  if (types.isKeyword(arg)) {
+    return arg
+  } else {
+    if (arg.startsWith(":")) {
+      return types.MakeKeyword(arg)
+    } else {
+      return types.MakeKeyword(":" + arg)
+    }
+  }
+})
+ns.set(new Symbol("keyword?"), arg => types.isKeyword(arg))
+ns.set(new Symbol("vector"), (...args) => types.arrayToVector(args))
+ns.set(new Symbol("vector?"), arg => types.isVector(arg))
+ns.set(new Symbol("hash-map"), (...args) => types.clone(args).toHashMap())
+ns.set(new Symbol("map?"), arg => types.isHash(arg))
+ns.set(new Symbol("assoc"), (hash, ...args) => {
+  let copy = types.clone(hash)
+  let otherArgs = args.toHashMap()
+  copy.assoc(otherArgs)
+  return copy
+})
+ns.set(new Symbol("dissoc"), (hash, ...keys) => {
+  let copy = types.clone(hash)
+  for (let key of keys) {
+    copy.delete(key)
+  }
+  return copy
+})
+ns.set(new Symbol("get"), (hash, key) => {
+  if (!hash) { return null }
+  if (hash.has(key)) {
+    return hash.get(key)
+  } else {
+    return null
+  }
+})
+ns.set(new Symbol("contains?"), (hash, key) => {
+  if (!hash) { return false }
+  return hash.has(key)
+})
+ns.set(new Symbol("keys"), hash => [...hash.keys()])
+ns.set(new Symbol("vals"), hash => [...hash.values()])
+
+ns.set(new Symbol("sequential?"), arg => types.isArrayLike(arg))
+
 
 // predicate is a function that takes element and returns bool
 Array.prototype.allSatisfy = function(predicate) {
@@ -93,8 +172,14 @@ function equals(lhs, rhs) {
   }
 
   if (types.isHash(lhs)) {
-    for (let [lhsKey, lhsValue] of lhs) {
-      if (!equals(lhsValue, rhs[lhsKey])) {
+    let lhsKeys = [...lhs.keys()]
+    let rhsKeys = [...rhs.keys()]
+    lhsKeys.sort()
+    rhsKeys.sort()
+    if (!equals(lhsKeys, rhsKeys)) { return false }
+
+    for (let lhsKey of lhsKeys) {
+      if (!equals(lhs.get(lhsKey), rhs.get(lhsKey))) {
         return false
       }
     }
@@ -105,5 +190,6 @@ function equals(lhs, rhs) {
     return lhs == rhs
   }
 }
+
 
 module.exports.ns = ns
