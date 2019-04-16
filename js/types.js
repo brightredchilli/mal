@@ -103,7 +103,15 @@ let isSymbol = token => {
 }
 
 let isMacro = token => {
-  return token instanceof Symbol
+  if (isFunction(token)) {
+    return token.is_macro
+  } else {
+    return false
+  }
+}
+
+let isNumber = token => {
+  return typeof token === "number"
 }
 
 let arrayToVector = array => {
@@ -167,6 +175,7 @@ module.exports.isArrayLike = isArrayLike
 module.exports.isFunction = isFunction
 module.exports.isSymbol = isSymbol
 module.exports.isAtom = isAtom
+module.exports.isNumber = isNumber
 module.exports.typeOf = typeOf
 module.exports.Symbol = Symbol
 module.exports.MalFunction = MalFunction

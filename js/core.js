@@ -146,6 +146,37 @@ ns.set(new Symbol("readline"), prompt => {
 ns.set(new Symbol("meta"), fn => fn.metadata)
 ns.set(new Symbol("with-meta"), (fn, metadata) => fn.withMetadata(metadata))
 ns.set(new Symbol("js-eval"), str => eval(str))
+ns.set(new Symbol("number?"), arg => types.isNumber(arg))
+ns.set(new Symbol("string?"), arg => types.isString(arg))
+ns.set(new Symbol("fn?"), arg => types.isFunction(arg))
+ns.set(new Symbol("macro?"), arg => types.isMacro(arg))
+ns.set(new Symbol("conj"), (arg, ...rest) => {
+  if (!types.isArrayLike(arg)) { return arg }
+  if (types.isVector(arg)) {
+    return arg.concat(rest)
+  } else {
+    rest.reverse()
+    return rest.concat(arg)
+  }
+})
+
+ns.set(new Symbol("seq"), arg => {
+  if (types.isVector(arg) && arg.length != 0) {
+    let copy = types.clone(arg)
+    copy.isVector = false
+    return copy
+  } else if (types.isArray(arg) && arg.length != 0) {
+    return arg
+  } else if (types.isString(arg) && arg.length != 0) {
+    return arg.split("")
+  }
+  return null
+})
+
+ns.set(new Symbol("time-ms"), () => {
+  return (new Date()).valueOf()
+})
+
 
 // predicate is a function that takes element and returns bool
 Array.prototype.allSatisfy = function(predicate) {
