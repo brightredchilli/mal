@@ -194,6 +194,7 @@ for (let [k, v] of core.ns) {
 }
 
 repl_env.set(new Symbol("eval"), ast => EVAL(ast, repl_env))
+repl_env.set(new Symbol("*host-language*"), "Javascript")
 
 function eval_ast(ast, env) {
   if (ast instanceof Array) {
@@ -228,16 +229,18 @@ rep("(defmacro! cond (fn* (& xs) (if (> (count xs) 0) (list 'if (first xs) (if (
 rep("(defmacro! or (fn* (& xs) (if (empty? xs) nil (if (= 1 (count xs)) (first xs) `(let* (or_FIXME ~(first xs)) (if or_FIXME or_FIXME (or ~@(rest xs))))))))")
 
 
+let cmd_args = argv.slice(1)
+repl_env.set(new Symbol("*ARGV*"), cmd_args)
+if (argv.length > 0) {
+  let filename = argv[0]
+
+  rep(`(load-file "${filename}")`)
+  process.exit(0)
+  return
+}
 // repl loop
 while (true) {
-  let cmd_args = argv.slice(1)
-  repl_env.set(new Symbol("*ARGV*"), cmd_args)
-  if (argv.length > 0) {
-    let filename = argv[0]
-
-    rep(`(load-file "${filename}")`)
-    return
-  }
+  // rep("(println (str \"Mal [\" *host-language* \"]\"))")
   var line = readline.readline("user> ");
   if (line === null) {
     break;

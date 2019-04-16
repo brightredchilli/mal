@@ -37,6 +37,13 @@ const MalFunction = function(ast, params, env, fn) {
   this.params = params
   this.env = env
   this.fn = fn
+  this.metadata = null
+}
+
+MalFunction.prototype.withMetadata = function(metadata) {
+  let copy = new MalFunction(this.ast, this.params, this.env, this.fn)
+  copy.metadata = metadata
+  return copy
 }
 
 

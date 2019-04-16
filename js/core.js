@@ -1,6 +1,7 @@
 "use strict"
 const fs = require('fs')
 const path = require('path')
+const readline = require('./node_readline')
 let types = require("./types")
 let printer = require("./printer")
 let reader = require("./reader")
@@ -137,7 +138,14 @@ ns.set(new Symbol("keys"), hash => [...hash.keys()])
 ns.set(new Symbol("vals"), hash => [...hash.values()])
 
 ns.set(new Symbol("sequential?"), arg => types.isArrayLike(arg))
+ns.set(new Symbol("readline"), prompt => {
+  let answer = readline.readline(prompt)
+  return answer
+})
 
+ns.set(new Symbol("meta"), fn => fn.metadata)
+ns.set(new Symbol("with-meta"), (fn, metadata) => fn.withMetadata(metadata))
+ns.set(new Symbol("js-eval"), str => eval(str))
 
 // predicate is a function that takes element and returns bool
 Array.prototype.allSatisfy = function(predicate) {

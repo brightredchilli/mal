@@ -60,6 +60,11 @@ function read_form(reader) {
   } else if (token == '~@') {
     reader.next()
     return [new Symbol("splice-unquote"), read_form(reader)]
+  } else if (token == '^') {
+    reader.next()
+    let metadata = read_form(reader)
+    let functionName = read_form(reader)
+    return [new Symbol("with-meta"), functionName, metadata]
   } else {
     return read_atom(reader)
   }
